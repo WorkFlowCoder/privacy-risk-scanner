@@ -1,0 +1,36 @@
+services:
+
+  extension:
+    build: ./apps/extension
+
+  backend:
+    build: ./apps/backend
+    ports:
+      - "8000:8000"
+
+  worker:
+    build: ./apps/worker
+
+  frontend:
+    build: ./apps/frontend
+    ports:
+      - "3000:3000"
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: privacy
+      POSTGRES_PASSWORD: privacy
+      POSTGRES_DB: privacy_scanner
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
