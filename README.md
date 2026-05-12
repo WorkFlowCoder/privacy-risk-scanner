@@ -4,9 +4,7 @@ Privacy Risk Scanner is a Chrome extension project designed to analyze websites�
 
 The goal of the project is to provide users with a clear and accessible privacy risk score based on how websites collect, store, share, and use personal data.
 
----
-
-# Project Goals
+## Project Goals
 
 The project aims to:
 
@@ -18,9 +16,7 @@ The project aims to:
 - Offer a modern browser extension experience
 - Prepare a scalable AI-powered architecture
 
----
-
-# Current State of the Project
+## Current State of the Project
 
 The project is currently in its initial development phase.
 
@@ -45,9 +41,7 @@ Planned features:
 - Risk comparison between websites
 - Structured AI outputs
 
----
-
-# Project Architecture
+## Project Architecture
 
 ```text
 privacy-risk-scanner/
@@ -70,24 +64,22 @@ privacy-risk-scanner/
 └── README.md
 ```
 
----
+## Technologies Used
 
-# Technologies Used
-
-## Frontend
+### Frontend
 
 - React
 - TypeScript
 - TailwindCSS
 - Plasmo
 
-## Backend
+### Backend
 
 - FastAPI
 - SQLAlchemy
 - Celery
 
-## Infrastructure
+### Infrastructure
 
 - Docker
 - Docker Compose
@@ -95,17 +87,14 @@ privacy-risk-scanner/
 - Redis
 - Nginx
 
-## AI
+### AI
 
-- OpenAI API
 - Structured outputs
 - Prompt engineering
 
----
+## Installation
 
-# Installation
-
-## Requirements
+### Requirements
 
 - Node.js 22+
 - npm
@@ -113,18 +102,48 @@ privacy-risk-scanner/
 - Docker Compose
 - Google Chrome
 
----
-
-# Clone the Repository
+### Clone the Repository
 
 ```bash
 git clone <repository-url>
 cd privacy-risk-scanner
 ```
 
----
+### Environment Configuration (.env)
 
-# Start Docker Services
+#### Environment Variables Setup
+
+Before starting the project, you must create your local environment file.
+
+A template is provided:
+
+```bash
+.env.example
+```
+
+#### Step 1 — Create your .env file
+
+```bash
+cp .env.example .env
+```
+
+#### Step 2 — Configure your variables
+
+Edit .env according to your local setup:
+
+```bash
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=privacy_scanner
+
+DB_HOST=postgres
+DB_PORT=5432
+
+BACKEND_PORT=8000
+FRONTEND_PORT=5173
+```
+
+## Start Docker Services
 
 ```bash
 docker compose up --build
@@ -138,9 +157,7 @@ This starts:
 - Worker placeholder
 - Frontend placeholder
 
----
-
-# Extension Setup
+## Extension Setup
 
 Go to the extension folder:
 
@@ -160,9 +177,7 @@ Start the development server:
 npm run dev
 ```
 
----
-
-# Load the Extension in Chrome
+## Load the Extension in Chrome
 
 Open:
 
@@ -180,9 +195,7 @@ Then:
 apps/extension/build/chrome-mv3-dev
 ```
 
----
-
-# Current Extension Features
+## Current Extension Features
 
 The extension currently:
 
@@ -191,20 +204,7 @@ The extension currently:
 - Detects the currently opened website URL
 - Prepares the future privacy analysis workflow
 
----
-
-# Example Current Popup
-
-```text
-Privacy Risk Scanner
-
-Current website:
-https://example.com
-```
-
----
-
-# Development Roadmap
+## Development Roadmap
 
 ## Phase 1
 
@@ -233,9 +233,7 @@ https://example.com
 - Website comparison
 - Statistics and analytics
 
----
-
-# Security & Privacy
+## Security & Privacy
 
 The extension is designed to analyze website legal documents only.
 
@@ -248,16 +246,12 @@ Future versions will:
 - Use secure API communication
 - Respect GDPR principles
 
----
-
-# Contributing
+## Contributing
 
 The project architecture is designed for scalability and modularity.
 
 Contributions, architecture suggestions, and improvements are welcome.
 
----
-
-# License
+## License
 
 MIT License
