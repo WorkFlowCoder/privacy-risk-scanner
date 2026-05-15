@@ -1,9 +1,14 @@
+from http.client import HTTPException
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from ..api.database import get_db
 from ..api.repository import AnalysisRepository
-from app.schemas.analysis import AnalyzeRequest, AnalyzeResponse
+
+from ..schemas.analysis import AnalyzeRequest, AnalyzeResponse
+
+from ..models.analyze import AnalysisOut, AnalysisDetailsOut
 
 router = APIRouter(
     prefix="/analyze",
@@ -21,7 +26,6 @@ def analyze() -> AnalyzeResponse:
         "message": "undefined URL"
     }
 
-
 @router.post("/")
 def analyze_website(payload: AnalyzeRequest) -> AnalyzeResponse:
     return {
@@ -32,7 +36,17 @@ def analyze_website(payload: AnalyzeRequest) -> AnalyzeResponse:
         "message": "Mock analysis completed"
     }
 
-@router.get("/results")
+@router.get("/results", response_model=list[AnalysisOut])
 def get_all_results(db: Session = Depends(get_db)):
     repo = AnalysisRepository(db)
-    return repo.get_all()
+    res = repo.get_all()
+    return res
+
+@router.get("/{analysis_id}", response_model=AnalysisDetailsOut)
+async def get_analysis(analysis_id: str, db: Session = Depends(get_db)):
+    repo = AnalysisRepository(db)
+    analysis = repo.get_by_id(analysis_id)
+    if not analysis:
+        raise HTTPException(status_code=404, detail="Analysis not found")
+
+    return analysis
