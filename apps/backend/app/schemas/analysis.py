@@ -9,3 +9,8 @@ class AnalyzeResponse(BaseModel):
     score: float
     rating: str
     message: str
+
+class AnalyzeRequestContent(BaseModel):
+    content: str
+    title: str
+    url: str

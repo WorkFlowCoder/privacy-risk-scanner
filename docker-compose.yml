@@ -1,7 +1,16 @@
 services:
 
   extension:
-    build: ./apps/extension
+    build:
+      context: .
+      dockerfile: apps/extension/Dockerfile
+    container_name: prs_extension
+    env_file:
+      - .env
+    volumes:
+      - ./apps/extension:/app/apps/extension
+      - /app/node_modules
+    command: npm run dev --workspace=extension-app
 
   backend:
     build: ./apps/backend
@@ -28,7 +37,9 @@ services:
     build: ./apps/worker
 
   frontend:
-    build: ./apps/frontend
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
     container_name: prs_frontend
     restart: always
     env_file:
@@ -36,7 +47,7 @@ services:
     ports:
       - "${FRONTEND_PORT}:5173"
     volumes:
-      - ./apps/frontend:/app
+      - ./apps/frontend:/app/apps/frontend
       - /app/node_modules
     depends_on:
       - backend

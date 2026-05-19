@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from ..api.database import get_db
 from ..api.repository import AnalysisRepository
 
-from ..schemas.analysis import AnalyzeRequest, AnalyzeResponse
+from ..schemas.analysis import AnalyzeRequest, AnalyzeResponse, AnalyzeRequestContent
 
 from ..models.analyze import AnalysisOut, AnalysisDetailsOut
 
@@ -15,16 +15,25 @@ router = APIRouter(
     tags=["analyze"]
 )
 
-@router.get("/")
-def analyze() -> AnalyzeResponse:
-    get_db()
+
+@router.post("/")
+def analyze_policy(data: AnalyzeRequest):
+
     return {
         "success": False,
-        "url": "http://example.com",
-        "score":-1,
-        "rating": "undefined",
-        "message": "undefined URL"
+        "url": data.url
     }
+
+#@router.get("/")
+#def analyze() -> AnalyzeResponse:
+#    get_db()
+#    return {
+#        "success": False,
+#        "url": "http://example.com",
+#        "score":-1,
+#        "rating": "undefined",
+#        "message": "undefined URL"
+#    }
 
 @router.post("/")
 def analyze_website(payload: AnalyzeRequest) -> AnalyzeResponse:

@@ -1,11 +1,22 @@
 import "./style.css"
 import { useState } from "react"
 import { useTheme } from "./hooks/useTheme"
+import { detectPrivacyPolicy } from "@privacy-scanner/privacy-policy-detector"
+import { extractPageContent } from "./services/pageExtractor"
+import { analyzePrivacyPolicy } from "./services/api"
+
+interface DetectionResult {
+  isPrivacyPolicy: boolean
+  confidence: number
+  summary: string
+}
 
 export default function PrivacyRiskScannerPopup() {
   const [currentUrl, setCurrentUrl] = useState("")
   const [manualUrl, setManualUrl] = useState("")
   const [showInfo, setShowInfo] = useState(false)
+  const [detection, setDetection] = useState<DetectionResult | null>(null)
+  const [isDetecting, setIsDetecting] = useState(false)
 
   const { toggleTheme } = useTheme()
 
@@ -13,6 +24,30 @@ export default function PrivacyRiskScannerPopup() {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       setCurrentUrl(tabs?.[0]?.url || "")
     })
+  }
+
+  const checkPrivacyPolicy = async () => {
+    setIsDetecting(true)
+    try {
+      const { content, title, url } = await extractPageContent()
+      const result = detectPrivacyPolicy(content, url, title)
+      console.log("Detection Result:", result)
+      if (result.isPrivacyPolicy) {
+        const apiResult = await analyzePrivacyPolicy({content,title,url,})
+        console.log("API Result:", apiResult)
+      }
+      setDetection(result)
+    } catch (error) {
+      console.error("Error detecting privacy policy:", error)
+      setDetection({
+        isPrivacyPolicy: false,
+        confidence: 0,
+        findings: [],
+        summary: "Failed to analyze page",
+      })
+    } finally {
+      setIsDetecting(false)
+    }
   }
 
   return (
@@ -103,6 +138,60 @@ export default function PrivacyRiskScannerPopup() {
           >
             Use current page for analysis
           </button>
+
+          <button
+            onClick={checkPrivacyPolicy}
+            disabled={isDetecting}
+            className="mt-2 w-full py-2 rounded-lg bg-blue-500 text-white text-xs font-semibold hover:bg-blue-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isDetecting ? "Checking..." : "Check if Privacy Policy"}
+          </button>
+
+          {detection && (
+            <div className={`mt-3 p-2 rounded-lg text-xs space-y-2 ${
+              detection.isPrivacyPolicy
+                ? "bg-emerald-500/20 border border-emerald-500/50"
+                : "bg-orange-500/20 border border-orange-500/50"
+            }`}>
+              <div className={detection.isPrivacyPolicy ? "text-emerald-700 dark:text-emerald-300" : "text-orange-700 dark:text-orange-300"}>
+                <div className="font-semibold">
+                  {detection.isPrivacyPolicy ? "✓ Privacy Policy Detected" : "✗ Not a Privacy Policy"}
+                </div>
+                <div className="mt-1">
+                  Confidence: {detection.confidence}%
+                </div>
+              </div>
+
+              {/* Debug Info */}
+              {detection.findings && detection.findings.length > 0 && (
+                <div className="mt-2 pt-2 border-t border-current/20 text-[10px] space-y-1">
+                  <div className="font-semibold">Detection Details:</div>
+                  {detection.findings.map((finding, idx) => (
+                    <div key={idx} className="pl-2 border-l border-current/30">
+                      <div className="font-semibold capitalize">{finding.type}: +{finding.score}pts</div>
+                      <div className="opacity-90">{finding.reason}</div>
+                      {finding.details && finding.details.length > 0 && (
+                        <div className="opacity-75 mt-1">
+                          Found: {finding.details.slice(0, 3).join(", ")}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {detection.findings && detection.findings.length === 0 && (
+                <div className="mt-2 pt-2 border-t border-current/20 text-[10px]">
+                  <div className="text-orange-600 dark:text-orange-400">No detection indicators found</div>
+                  <div className="opacity-75 mt-1">Check if page content is being extracted correctly</div>
+                </div>
+              )}
+
+              <div className="mt-2 text-[10px] opacity-75">
+                {detection.summary}
+              </div>
+            </div>
+          )}
 
         </div>
 
