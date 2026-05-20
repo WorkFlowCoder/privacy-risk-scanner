@@ -17,7 +17,7 @@ export const analyzePrivacyPolicy = async (
   payload: AnalyzeRequest
 ): Promise<AnalyzeResponse> => {
   try {
-    const response = await fetch(`${url}/analyze`, {
+    const response = await fetch(`${url}/analyze/`, {
       method: "POST",
 
       headers: {

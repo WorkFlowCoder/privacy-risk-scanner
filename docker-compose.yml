@@ -13,6 +13,8 @@ services:
     command: npm run dev --workspace=extension-app
 
   backend:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     build: ./apps/backend
     container_name: prs_backend
     env_file:

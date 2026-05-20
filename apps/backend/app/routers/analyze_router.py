@@ -1,5 +1,6 @@
 from http.client import HTTPException
 
+from ..services.llm_service import analyze_with_llm
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -17,7 +18,15 @@ router = APIRouter(
 
 
 @router.post("/")
-def analyze_policy(data: AnalyzeRequest):
+def analyze_policy(data: AnalyzeRequestContent):
+    result = analyze_with_llm(
+        content=data.content
+    )
+
+    return {
+        "success": True,
+        "result": result,
+    }
 
     return {
         "success": False,
