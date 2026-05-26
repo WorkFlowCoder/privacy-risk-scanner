@@ -2,4 +2,10 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-CMD ["python3"]
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+CMD ["celery", "-A", "celery_app.celery", "worker", "--loglevel=info"]

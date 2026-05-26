@@ -1,14 +1,10 @@
 from http.client import HTTPException
-
-from ..services.llm_service import analyze_with_llm
+from celery import Celery
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-
 from ..api.database import get_db
 from ..api.repository import AnalysisRepository
-
 from ..schemas.analysis import AnalyzeRequest, AnalyzeResponse, AnalyzeRequestContent
-
 from ..models.analyze import AnalysisOut, AnalysisDetailsOut
 
 router = APIRouter(
@@ -16,21 +12,23 @@ router = APIRouter(
     tags=["analyze"]
 )
 
+celery_client = Celery(
+    "backend_client",
+    broker="redis://redis:6379/0",
+    backend="redis://redis:6379/0",
+)
 
 @router.post("/")
 def analyze_policy(data: AnalyzeRequestContent):
-    result = analyze_with_llm(
-        content=data.content
+    task = celery_client.send_task(
+        "analyze_policy_task",
+        args=[data.content],
     )
 
     return {
         "success": True,
-        "result": result,
-    }
-
-    return {
-        "success": False,
-        "url": data.url
+        "task_id": task.id,
+        "status": "queued",
     }
 
 #@router.get("/")

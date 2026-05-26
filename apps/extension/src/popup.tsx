@@ -3,7 +3,7 @@ import { useState } from "react"
 import { useTheme } from "./hooks/useTheme"
 import { detectPrivacyPolicy } from "@privacy-scanner/privacy-policy-detector"
 import { extractPageContent } from "./services/pageExtractor"
-import { analyzePrivacyPolicy } from "./services/api"
+import { analyzePrivacyPolicy, waitForAnalysisResult } from "./services/api"
 
 interface DetectionResult {
   isPrivacyPolicy: boolean
@@ -17,6 +17,9 @@ export default function PrivacyRiskScannerPopup() {
   const [showInfo, setShowInfo] = useState(false)
   const [detection, setDetection] = useState<DetectionResult | null>(null)
   const [isDetecting, setIsDetecting] = useState(false)
+
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState(null)
 
   const { toggleTheme } = useTheme()
 
@@ -33,8 +36,16 @@ export default function PrivacyRiskScannerPopup() {
       const result = detectPrivacyPolicy(content, url, title)
       console.log("Detection Result:", result)
       if (result.isPrivacyPolicy) {
-        const apiResult = await analyzePrivacyPolicy({content,title,url,})
-        console.log("API Result:", apiResult)
+        setIsAnalyzing(true)
+        const apiResponse = await analyzePrivacyPolicy({ content, title, url })
+        if (!apiResponse.success || !apiResponse.task_id) {
+          throw new Error("Failed to start analysis")
+        }
+        const finalResult = await waitForAnalysisResult( apiResponse.task_id )
+
+        setAnalysisResult(finalResult)
+        console.log("Analysis Result:", finalResult)
+        setIsAnalyzing(false)
       }
       setDetection(result)
     } catch (error) {

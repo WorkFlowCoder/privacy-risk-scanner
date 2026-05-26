@@ -4,7 +4,7 @@ pydantic
 python-dotenv
 sqlalchemy
 psycopg2-binary
-redis
-celery
 asyncpg
 requests
+celery[redis]
+redis

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import analyze_router
+from .routers import analyze_router, tasks
 
 app = FastAPI(
     title="Privacy Risk Scanner API",
@@ -17,6 +17,7 @@ app.add_middleware(
 )
 
 app.include_router(analyze_router.router)
+app.include_router(tasks.router)
 
 @app.get("/")
 async def root():

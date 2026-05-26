@@ -13,8 +13,6 @@ services:
     command: npm run dev --workspace=extension-app
 
   backend:
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     build: ./apps/backend
     container_name: prs_backend
     env_file:
@@ -34,9 +32,19 @@ services:
       - "${BACKEND_PORT}:8000"
     volumes:
       - ./apps/backend:/app
-
+  
   worker:
     build: ./apps/worker
+    container_name: prs_worker
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    volumes:
+      - ./apps/worker:/app
+    command: celery -A celery_app.celery worker --loglevel=info
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   frontend:
     build:
