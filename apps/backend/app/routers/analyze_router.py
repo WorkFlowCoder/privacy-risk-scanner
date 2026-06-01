@@ -2,6 +2,7 @@ from http.client import HTTPException
 from celery import Celery
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from ..api.database import get_db
 from ..api.repository import AnalysisRepository
 from ..schemas.analysis import AnalyzeRequest, AnalyzeResponse, AnalyzeRequestContent
@@ -19,10 +20,21 @@ celery_client = Celery(
 )
 
 @router.post("/")
-def analyze_policy(data: AnalyzeRequestContent):
+def analyze_policy(data: AnalyzeRequestContent, db: Session = Depends(get_db)):
+    user_id = db.execute(
+        text("""
+            SELECT id
+            FROM users
+            LIMIT 1
+        """)
+    ).scalar()
     task = celery_client.send_task(
         "analyze_policy_task",
-        args=[data.content],
+        kwargs={
+            "user_id": str(user_id),
+            "url": data.url,
+            "content": data.content
+        }
     )
 
     return {
@@ -30,6 +42,8 @@ def analyze_policy(data: AnalyzeRequestContent):
         "task_id": task.id,
         "status": "queued",
     }
+
+#conn, user_id: str, url: str, content: str
 
 #@router.get("/")
 #def analyze() -> AnalyzeResponse:

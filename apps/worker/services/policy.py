@@ -123,6 +123,6 @@ def analyze_with_llm(content: str):
 
     result = compute_scores(llm_response)
 
-    #print("LLM response:", json.dumps(result, indent=2, ensure_ascii=False), flush=True)
+    print("LLM response:", json.dumps(result, indent=2, ensure_ascii=False), flush=True)
 
     return result
