@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, String, Float, Text, DateTime, ForeignKey
+from sqlalchemy import Column, String, Float, Text, DateTime, ForeignKey, UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
+import uuid
 
 Base = declarative_base()
 
@@ -9,9 +10,9 @@ Base = declarative_base()
 class Website(Base):
     __tablename__ = "websites"
     
-    id = Column(Integer, primary_key=True, index=True)
-    domain = Column(String(255), nullable=False)
-    normalized_url = Column(String(500), unique=True, nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    domain = Column(String, nullable=False)
+    normalized_url = Column(String, unique=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -21,13 +22,13 @@ class Website(Base):
 class Analysis(Base):
     __tablename__ = "analyses"
     
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(String(255), nullable=False)
-    website_id = Column(Integer, ForeignKey("websites.id"), nullable=False)
-    url = Column(String(500), nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    user_id = Column(String, nullable=False)
+    website_id = Column(UUID(as_uuid=True), ForeignKey("websites.id"), nullable=False)
+    url = Column(String, nullable=False)
     global_score = Column(Float, nullable=False)
-    rating = Column(String(50), nullable=False)
-    status = Column(String(50), nullable=False)
+    rating = Column(String, nullable=False)
+    status = Column(String, nullable=False)
     summary = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -39,12 +40,12 @@ class Analysis(Base):
 class Clause(Base):
     __tablename__ = "clauses"
     
-    id = Column(Integer, primary_key=True, index=True)
-    analysis_id = Column(Integer, ForeignKey("analyses.id"), nullable=False)
-    category = Column(String(255), nullable=False)
-    severity = Column(String(50), nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    analysis_id = Column(UUID(as_uuid=True), ForeignKey("analyses.id"), nullable=False)
+    category = Column(String, nullable=False)
+    severity = Column(String, nullable=False)
     score_impact = Column(Float, nullable=False)
-    title = Column(String(255), nullable=False)
+    title = Column(String, nullable=False)
     explanation = Column(Text, nullable=False)
     extracted_text = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

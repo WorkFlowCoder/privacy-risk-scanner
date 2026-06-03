@@ -35,6 +35,7 @@ function Dashboard() {
   const [results, setResults] = useState<any>(null)
 
   const severityClasses: Record<string, string> = {
+    critical: "bg-red-700/30 text-red-200 border-red-600/60",
     high: "bg-red-500/20 text-red-400 border-red-500/30",
     medium: "bg-orange-500/20 text-orange-400 border-orange-500/30",
     low: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
@@ -115,13 +116,13 @@ function Dashboard() {
               {result?.summary ?? "No summary available."}
             </p>
 
-            {result.clauses?.map((clause: any) => (
-              <div key={clause.title} className="flex gap-2 flex-wrap">
-                <div className={`${severityClasses[clause.severity]} border px-3 py-1 rounded-full text-sm`}>
-                  {clause.category}
+            <div className="flex gap-2 flex-wrap">
+              {result.clauses?.map((clause: any) => (
+                <div key={clause.title} className={`${severityClasses[clause.severity]} border px-3 py-1 rounded-full text-sm`}>
+                  {clause.category.replace("_", " ")}
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
 
           </div>
         ))}

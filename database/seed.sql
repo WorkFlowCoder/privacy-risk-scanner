@@ -3,7 +3,7 @@ INSERT INTO users (email, password_hash) VALUES ('demo@privacyscanner.ia', 'hash
 
 -- WEBSITE
 INSERT INTO websites (domain, normalized_url) VALUES (
-    'google.com', 'https://google.com'
+    'www.google.com', 'https://google.com'
 );
 
 -- ANALYSIS
@@ -12,8 +12,8 @@ INSERT INTO analyses (user_id, website_id, url, global_score, rating, status, su
     (SELECT id FROM users LIMIT 1),
     (SELECT id FROM websites LIMIT 1),
     'https://google.com/privacy',
-    72,
-    'orange',
+    90,
+    'green',
     'completed',
     'This website shares user data with third parties.'
     );

@@ -2,12 +2,33 @@ from llm.factory import get_llm_client
 from prompts.privacy_prompt import SYSTEM_PROMPT
 import json
 
+
+def format_category_name(category: str) -> str:
+    """Convert snake_case category to Title Case (e.g., 'data_exploitation' -> 'Data Exploitation')"""
+    return ' '.join(word.capitalize() for word in category.split('_'))
+
+
+def get_severity_color(score_impact: int) -> str:
+    """Get severity color class based on score impact (points removed)"""
+    if score_impact <= -20:
+        return "red"      # CRITICAL: -20 points
+    elif score_impact <= -15:
+        return "orange"   # HIGH: -15 points
+    elif score_impact <= -8:
+        return "yellow"   # MEDIUM: -8 points
+    else:
+        return "blue"     # LOW: -3 points
+
+
 SEVERITY_SCORES = {
     "LOW": -3,
     "MEDIUM": -8,
     "HIGH": -15,
     "CRITICAL": -20,
 }
+
+# Reverse mapping: score_impact -> severity level
+SCORE_TO_SEVERITY = {v: k for k, v in SEVERITY_SCORES.items()}
 
 CATEGORY_CONSENT = {
     "consent_dark_patterns",
@@ -35,17 +56,14 @@ def compute_scores(result: dict) -> dict:
     high_count = 0
 
     for finding in findings:
-        severity = (finding.get("severity") or "LOW").upper().strip()
         category = finding.get("category", "")
-
-        if severity not in SEVERITY_SCORES:
-            severity = "LOW"
-
-        # --------------------------
-        # SCORE IMPACT (PER FINDING)
-        # --------------------------
-        score_impact = SEVERITY_SCORES[severity]
-        finding["score_impact"] = score_impact
+        
+        # Get score_impact from LLM (already in finding)
+        score_impact = finding.get("score_impact", -3)
+        finding["score_impact"] = score_impact  # Ensure it's persisted
+        
+        # Map score_impact back to severity level (LOW, MEDIUM, HIGH, CRITICAL)
+        finding["severity"] = SCORE_TO_SEVERITY.get(score_impact, "LOW").lower()
 
         # --------------------------
         # GLOBAL SCORE
@@ -67,6 +85,7 @@ def compute_scores(result: dict) -> dict:
         # --------------------------
         # SEVERITY COUNTING
         # --------------------------
+        severity = finding.get("severity", "LOW")
         if severity == "CRITICAL":
             critical_count += 1
         elif severity == "HIGH":

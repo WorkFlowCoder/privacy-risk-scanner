@@ -51,7 +51,14 @@ class OllamaClient:
 
         data = response.json()
         raw = data["message"]["content"]
-        return json.loads(raw)
+        
+        if not raw or not raw.strip():
+            raise RuntimeError(f"Ollama returned empty response. Full response: {data}")
+        
+        try:
+            return json.loads(raw)
+        except json.JSONDecodeError as e:
+            raise RuntimeError(f"Ollama response is not valid JSON: {raw[:500]}") from e
 
     def clean_text(self, text: str) -> str:
         text = text.replace("\n", " ").replace("\r", " ")

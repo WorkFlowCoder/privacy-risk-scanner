@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS websites (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   domain VARCHAR(255) NOT NULL,
-  normalized_url VARCHAR(255) NOT NULL,
+  normalized_url VARCHAR(2048) NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS analyses (
   website_id UUID REFERENCES websites(id) ON DELETE CASCADE,
   url TEXT NOT NULL,
   global_score INTEGER,
-  rating VARCHAR(20),
-  status VARCHAR(20) NOT NULL,
+  rating VARCHAR(50),
+  status VARCHAR(50) NOT NULL,
   summary TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -36,10 +36,10 @@ CREATE TABLE IF NOT EXISTS analyses (
 CREATE TABLE IF NOT EXISTS clauses (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   analysis_id UUID REFERENCES analyses(id) ON DELETE CASCADE,
-  category VARCHAR(20),
-  severity VARCHAR(20),
-  score_impact INTEGER,
-  title VARCHAR(255),
+  category VARCHAR(255),
+  severity VARCHAR(255),
+  score_impact FLOAT,
+  title VARCHAR(1024),
   explanation TEXT,
   extracted_text TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
